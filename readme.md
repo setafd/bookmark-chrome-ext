@@ -1,4 +1,4 @@
-# Chromium Extension: Bookmark manager
+# Chromium Extension: Bookmark dashboard
 
 ## Overview
 This Chromium-based browser extension replaces the default "New Tab" page with custom page.
