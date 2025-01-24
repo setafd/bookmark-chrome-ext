@@ -80,6 +80,8 @@ const onCreateFolderFinish = async (event) => {
 };
 
 const onResetFolderCreating = (event) => {
+  event.currentTarget.removeEventListener("keydown", onCreateFolderFinish);
+  event.currentTarget.removeEventListener("focusout", onResetFolderCreating);
   event.currentTarget.remove();
 };
 
