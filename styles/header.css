@@ -42,6 +42,25 @@
   border-radius: var(--radius);
 }
 
+.navigation__new-item {
+  display: flex;
+  margin-left: 1rem;
+  align-items: center;
+  gap: 0.5rem;
+  border-left: 1px solid var(--muted-foreground);
+}
+
+.navigation__new-item:hover,
+.navigation__new-item:focus {
+  border-radius: 0;
+  border-bottom-right-radius: var(--radius);
+}
+
+.dark .navigation__item-icon {
+  filter: invert(99%) sepia(100%) saturate(0%) hue-rotate(306deg)
+    brightness(105%) contrast(100%);
+}
+
 .navigation__item_selected::after {
   position: absolute;
   bottom: 0;

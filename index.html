@@ -10,7 +10,14 @@
   </head>
   <body>
     <header class="header">
-      <nav id="nav" class="navigation"></nav>
+      <nav id="nav" class="navigation">
+        <ul class="navigation__wrapper">
+          <li id="add-folder" tabindex="0" class="navigation__item navigation__new-item">
+            <img class="navigation__item-icon" src="assets/plus.svg" />
+            <span>Add new</span>
+          </li>
+        </ul>
+      </nav>
     </header>
     <main>
       <section id="bookmarks"></section>
@@ -31,7 +38,13 @@
             <button type="submit">Save</button>
             <button type="reset">Cancel</button>
           </div>
-          <button id="delete-bookmark" class="bookmark-form__delete-btn_hidden" type="button">Delete</button>
+          <button
+            id="delete-bookmark"
+            class="bookmark-form__delete-btn_hidden"
+            type="button"
+          >
+            Delete
+          </button>
         </div>
       </form>
     </dialog>

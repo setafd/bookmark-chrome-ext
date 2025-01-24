@@ -6,11 +6,9 @@ import {
   onEditFolder,
 } from "./lib.js";
 
-export const createNavContainer = () => {
+export const getNav = () => {
   const navigator = document.getElementById("nav");
-  const list = document.createElement("ul");
-  list.className = "navigation__wrapper";
-  navigator.prepend(list);
+  const list = navigator.querySelector("ul");
 
   return list;
 };

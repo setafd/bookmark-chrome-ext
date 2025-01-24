@@ -1,3 +1,5 @@
+import { getBookmarksTree } from "../bookmarks/api.js";
+
 export const updateTabGroup = async (oldTitle, newTitle) => {
   try {
     const groups = await chrome.tabGroups.query({});
@@ -31,6 +33,14 @@ export const openTab = async (url, groupTitle, inCurrent) => {
   } catch (error) {
     console.error(`Error opening tab: ${error}`);
   }
+};
+
+export const createFolder = async (title) => {
+  const bookmarkTree = await getBookmarksTree();
+
+  const parent = bookmarkTree.pop();
+
+  return await chrome.bookmarks.create({ title, parentId: parent.id });
 };
 
 export const updateFolder = async (id, title) => {

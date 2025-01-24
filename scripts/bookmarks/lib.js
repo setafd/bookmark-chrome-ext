@@ -133,7 +133,6 @@ export const onDragEndBookmark = async (event) => {
   const folders = await chrome.bookmarks.getChildren(parentFolder.id);
 
   const folderIndexes = folders.filter((f) => !f.url).map((f) => f.index);
-  console.log(folderIndexes);
 
   const bookmark = (await chrome.bookmarks.get(event.target.id))[0];
   let newIndex = Array.prototype.indexOf.call(
@@ -148,14 +147,10 @@ export const onDragEndBookmark = async (event) => {
   // Ignore folders indexes
   folderIndexes.forEach((f) => f > newIndex && newIndex++);
 
-  await chrome.bookmarks.move(
-    bookmark.id,
-    {
-      parentId,
-      index: newIndex,
-    },
-    (res) => console.log(res)
-  );
+  await chrome.bookmarks.move(bookmark.id, {
+    parentId,
+    index: newIndex,
+  });
 };
 
 export const onEditGroup = (event) => {

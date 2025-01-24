@@ -4,7 +4,7 @@ export const getBookmarksTree = async () => {
       if (chrome.runtime.lastError) {
         reject(new Error(chrome.runtime.lastError));
       } else {
-        resolve(nodes);
+        resolve(nodes[0].children);
       }
     });
   });

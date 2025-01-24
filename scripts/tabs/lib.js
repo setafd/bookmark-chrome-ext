@@ -1,10 +1,23 @@
 import { renderFolder } from "../bookmarks/ui.js";
 import {
+  getFolderOrder,
   setFolderOrder,
   setLastSelecftedFolder,
   setUngroupedFolderName,
 } from "../store/api.js";
-import { updateFolder } from "./api.js";
+import { createFolder, updateFolder } from "./api.js";
+import { createNavItem } from "./ui.js";
+
+export const attachCreateFolder = () => {
+  const createFolderButton = document.getElementById("add-folder");
+  createFolderButton.onclick = onCreateFolder;
+  createFolderButton.onkeydown = (event) => {
+    if (event.key === "Enter") {
+      event.preventDefault();
+      onCreateFolder(event);
+    }
+  };
+};
 
 export const getActiveFolder = () => {
   return document.querySelector(".navigation__item_selected");
@@ -21,6 +34,54 @@ export const onChangeFolder = (event) => {
   renderFolder(id);
 
   setLastSelecftedFolder(id);
+};
+
+const onCreateFolder = async (event) => {
+  const createEl = event.currentTarget;
+  const newFolder = document.createElement("li");
+  newFolder.className = "navigation__item";
+
+  const folderInput = document.createElement("input");
+  newFolder.prepend(folderInput);
+
+  createEl.parentNode.insertBefore(newFolder, createEl);
+  folderInput.focus();
+
+  newFolder.addEventListener("keydown", onCreateFolderFinish);
+  newFolder.addEventListener("focusout", onResetFolderCreating);
+};
+
+const onCreateFolderFinish = async (event) => {
+  if (event.key === "Enter") {
+    event.preventDefault();
+    event.preventDefault();
+    const targetFolder = event.currentTarget;
+    const name = targetFolder.firstElementChild.value;
+
+    if (name === "") {
+      onResetFolderCreating(event);
+      return;
+    }
+
+    const folder = await createFolder(name);
+
+    const newItem = createNavItem(folder.id, folder.title);
+    const order = await getFolderOrder();
+    order.push(newItem.id);
+    setFolderOrder(order);
+
+    targetFolder.removeEventListener("keydown", onCreateFolderFinish);
+    targetFolder.removeEventListener("focusout", onResetFolderCreating);
+    targetFolder.replaceWith(newItem);
+  }
+  if (event.key === "Escape") {
+    event.preventDefault();
+    onResetFolderCreating(event);
+  }
+};
+
+const onResetFolderCreating = (event) => {
+  event.currentTarget.remove();
 };
 
 export const onEditFolder = (event) => {

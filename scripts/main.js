@@ -3,8 +3,10 @@ import {
   getFolderOrder,
   getLastSelectedFolder,
   getUngroupedFolderName,
+  setFolderOrder,
 } from "./store/api.js";
-import { createNavContainer, createNavItem } from "./tabs/ui.js";
+import { attachCreateFolder } from "./tabs/lib.js";
+import { getNav, createNavItem } from "./tabs/ui.js";
 
 const isDarkTheme = window.matchMedia("(prefers-color-scheme: dark)");
 const root = document.querySelector(":root");
@@ -12,12 +14,10 @@ if (isDarkTheme) root.className = "dark";
 
 const onInit = async () => {
   try {
-    const bookmarkTreeNodes = await getBookmarksTree();
-
-    const bookmarksTree = bookmarkTreeNodes[0].children;
+    const bookmarksTree = await getBookmarksTree();
     const folderOrder = await getFolderOrder();
 
-    const navigator = createNavContainer();
+    const navigation = getNav();
 
     let hasUnfolderedLinks = false;
     let folders = [];
@@ -40,29 +40,43 @@ const onInit = async () => {
 
     if (folderOrder) {
       folders.sort(
-        (a, b) => folderOrder.indexOf(a.id) - folderOrder.indexOf(b.id)
+        (a, b) => folderOrder.indexOf(b.id) - folderOrder.indexOf(a.id)
       );
+    } else {
+      setFolderOrder(folders.map((folder) => folder.id));
     }
 
     folders.forEach((folder) => {
       const navItem = createNavItem(folder.id, folder.title);
-      navigator.append(navItem);
+      navigation.prepend(navItem);
     });
 
     const lastSelectedId = await getLastSelectedFolder();
 
     if (lastSelectedId) {
-      const lastSelectedEl = navigator.querySelector(
+      const lastSelectedEl = navigation.querySelector(
         `li[id="${lastSelectedId}"]`
       );
       if (lastSelectedEl) lastSelectedEl.click();
-      else navigator.firstElementChild.click();
+      else navigation.firstElementChild.click();
     } else {
-      navigator.firstElementChild.click();
+      navigation.firstElementChild.click();
     }
   } catch (error) {
     console.error(`Error initializing: ${error}`);
   }
+
+  attachCreateFolder();
 };
 
 onInit();
+
+document.addEventListener("visibilitychange", function () {
+  if (!document.hidden) {
+    const navigation = getNav();
+    const createFolderBtn = document.getElementById('add-folder');
+    navigation.innerHTML = "";
+    navigation.prepend(createFolderBtn);
+    onInit();
+  }
+});
