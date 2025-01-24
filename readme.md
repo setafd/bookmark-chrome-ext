@@ -15,6 +15,7 @@ It organizes and displays your bookmarks in groups based on the folder structure
 ## Limitations
 - Works best with two levels of nesting (e.g., "Other Bookmarks" → "Your Folder" → "Second-level Folder").
 - Folder levels beyond the second are displayed as if they are second-level folders.
+- Works only with tabGroup chromium API
 
 ## Usage
 1. Open a new tab in your browser.
