@@ -19,10 +19,10 @@ export const deleteBookmark = (id) => chrome.bookmarks.remove(id);
 
 export const updateGroup = async (id, title) => {
   try {
-    const folder = await chrome.bookmarks.get(id);
+    const group = await chrome.bookmarks.get(id);
     await chrome.bookmarks.update(id, { title });
 
-    return folder;
+    return group;
   } catch (error) {
     console.error(`Error editing group title: ${error}`);
   }

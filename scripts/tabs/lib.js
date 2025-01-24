@@ -6,7 +6,7 @@ import {
   setUngroupedFolderName,
 } from "../store/api.js";
 import { createFolder, deleteFolder, updateFolder } from "./api.js";
-import { createNavItem } from "./ui.js";
+import { createNavItem, getNav } from "./ui.js";
 
 export const attachCreateFolder = () => {
   const createFolderButton = document.getElementById("add-folder");
@@ -37,14 +37,14 @@ export const onChangeFolder = (event) => {
 };
 
 const onCreateFolder = async (event) => {
-  const createEl = event.currentTarget;
   const newFolder = document.createElement("li");
   newFolder.className = "navigation__item";
 
   const folderInput = document.createElement("input");
   newFolder.prepend(folderInput);
 
-  createEl.parentNode.insertBefore(newFolder, createEl);
+  const nav = getNav();
+  nav.append(newFolder);
   folderInput.focus();
 
   newFolder.addEventListener("keydown", onCreateFolderFinish);
@@ -118,7 +118,13 @@ export const onEditFolder = (event) => {
 const onDeleteFolder = async (event) => {
   const parentNode = event.currentTarget.parentNode;
   const res = await deleteFolder(parentNode.id);
-  if (res) parentNode.remove();
+  if (res) {
+    parentNode.removeEventListener("keydown", onSaveFolder);
+    parentNode.removeEventListener("focusout", onResetFolder);
+    parentNode.remove();
+    const nav = getNav();
+    nav.firstElementChild?.click();
+  }
 };
 
 const onSaveFolder = async (event) => {
@@ -140,14 +146,11 @@ const onSaveFolder = async (event) => {
         setUngroupedFolderName(name);
       }
 
-      targetFolder.innerText = name;
-
-      targetFolder.ondblclick = onEditFolder;
-
-      targetFolder.draggable = true;
-
       targetFolder.removeEventListener("keydown", onSaveFolder);
       targetFolder.removeEventListener("focusout", onResetFolder);
+
+      const element = createNavItem(id, name);
+      targetFolder.replaceWith(element);
     } catch (e) {
       alert("Something went wrong. Can't update folder name");
       console.error(e);
@@ -162,15 +165,15 @@ const onSaveFolder = async (event) => {
 const onResetFolder = (event) => {
   if (event.currentTarget.contains(event.relatedTarget)) return;
   const targetFolder = event.currentTarget;
-  const name = targetFolder.children[0].defaultValue;
-
-  targetFolder.innerText = name;
-  targetFolder.ondblclick = onEditFolder;
-
-  targetFolder.draggable = true;
 
   targetFolder.removeEventListener("keydown", onSaveFolder);
   targetFolder.removeEventListener("focusout", onResetFolder);
+
+  const element = createNavItem(
+    targetFolder.id,
+    targetFolder.children[0].defaultValue
+  );
+  targetFolder.replaceWith(element);
 };
 
 let dragElementId;

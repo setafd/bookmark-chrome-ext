@@ -73,10 +73,16 @@ onInit();
 
 document.addEventListener("visibilitychange", function () {
   if (!document.hidden) {
-    const navigation = getNav();
-    const createFolderBtn = document.getElementById("add-folder");
-    navigation.innerHTML = "";
-    navigation.prepend(createFolderBtn);
     onInit();
   }
 });
+
+// Stypid workaround to reset form in dialog
+const dialog = document.getElementById("dialog");
+dialog.addEventListener('close', ({ currentTarget }) => {
+  const [titleInput, urlInput] = currentTarget.getElementsByTagName("input");
+  const deleteButton = currentTarget.querySelector("button[id='delete-bookmark']")
+  titleInput.value = "";
+  urlInput.value = "";
+  deleteButton.classList.add("bookmark-form__delete-btn_hidden");
+})

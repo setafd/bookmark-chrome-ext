@@ -4,27 +4,26 @@
     <meta charset="UTF-8" />
     <title>Bookmark Dashboard</title>
     <link rel="stylesheet" type="text/css" href="styles/reset.css" />
-    <link rel="stylesheet" type="text/css" href="styles/header.css" />
     <link rel="stylesheet" type="text/css" href="styles/main.css" />
+    <link rel="stylesheet" type="text/css" href="styles/header.css" />
     <link rel="stylesheet" type="text/css" href="styles/bookmarks.css" />
   </head>
   <body>
     <header class="header">
       <nav id="nav" class="navigation">
-        <ul class="navigation__wrapper">
-          <li id="add-folder" tabindex="0" class="navigation__item navigation__new-item">
-            <img class="navigation__item-icon" src="assets/plus.svg" />
-            <span>Add new</span>
-          </li>
-        </ul>
+        <ul class="navigation__wrapper"></ul>
       </nav>
+      <button id="add-folder" tabindex="0" class="button header__add-button">
+        <img class="header__add-icon" src="assets/plus.svg" />
+        <span>Add new</span>
+      </button>
     </header>
     <main>
       <section id="bookmarks"></section>
     </main>
 
     <dialog id="dialog" class="edit-modal">
-      <form id="edit-bookmark" class="bookmark-form">
+      <form id="edit-bookmark" class="bookmark-form" method="dialog">
         <label class="bookmark-form__item">
           Title
           <input class="bookmark-form__input" name="title" />
@@ -35,12 +34,12 @@
         </label>
         <div class="bookmark-form__footer">
           <div>
-            <button type="submit">Save</button>
-            <button type="reset">Cancel</button>
+            <button class="button button_primary" type="submit">Save</button>
+            <button class="button button_primary" type="reset">Cancel</button>
           </div>
           <button
             id="delete-bookmark"
-            class="bookmark-form__delete-btn_hidden"
+            class="button button_primary bookmark-form__delete-btn_hidden"
             type="button"
           >
             Delete

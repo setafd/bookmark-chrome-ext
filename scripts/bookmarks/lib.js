@@ -34,8 +34,8 @@ export const onEditBookmark = async (event) => {
 
   editDialog.showModal();
 
-  editForm.querySelector('button[type="reset"]').onclick = () => {
-    deleteButton.classList.add("bookmark-form__delete-btn_hidden");
+  const resetButton = editForm.querySelector('button[type="reset"]');
+  resetButton.onclick = () => {
     editDialog.close();
   };
 
@@ -61,9 +61,9 @@ export const onEditBookmark = async (event) => {
   deleteButton.onclick = async () => {
     await deleteBookmark(bookmarkId);
 
-    // Really lazy again :9
-    const selectedTab = getActiveFolder();
-    renderFolder(selectedTab.id);
+    const bookmarkContainer = getBookmarkContainer();
+    const deletedElement = bookmarkContainer.querySelector(`[id='${bookmarkId}']`);
+    deletedElement.remove();
     editDialog.close();
   };
 };
@@ -77,7 +77,8 @@ export const onCreateBookmark = async (event) => {
 
   editDialog.showModal();
 
-  editForm.querySelector('button[type="reset"]').onclick = () => {
+  const resetButton = editForm.querySelector('button[type="reset"]');
+  resetButton.onclick = () => {
     editDialog.close();
   };
 

@@ -17,7 +17,12 @@ export const createNavItem = (id, title) => {
   const item = document.createElement("li");
   item.className = "navigation__item";
   item.tabIndex = 0;
-  item.textContent = title;
+
+  const textEl = document.createElement('span');
+  textEl.className = "navigation__item-text"
+  textEl.textContent = title;
+
+  item.prepend(textEl);
 
   item.onclick = onChangeFolder;
   item.onkeydown = (event) => {

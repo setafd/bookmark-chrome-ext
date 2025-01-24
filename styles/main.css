@@ -66,20 +66,6 @@ main {
   flex: 1;
 }
 
-button {
-  background-color: var(--primary);
-  color: var(--primary-foreground);
-  border-radius: var(--radius);
-  padding-block: 0.25rem;
-  padding-inline: 1rem;
-  border: none;
-  cursor: pointer;
-}
-
-button:hover {
-  opacity: 0.8;
-}
-
 input {
   color: var(--foreground);
   background-color: var(--background);
@@ -106,6 +92,24 @@ dialog::backdrop {
   position: fixed;
   right: 0;
   top: 0;
+}
+
+.button {
+  border-radius: var(--radius);
+  padding-block: 0.5rem;
+  padding-inline: 1rem;
+  border: none;
+  cursor: pointer;
+  background-color: unset;
+}
+
+.button_primary {
+  background-color: var(--primary);
+  color: var(--primary-foreground);
+}
+
+.button_primary:hover {
+  background-color: hsl(from var(--primary) h s l / 0.8);
 }
 
 .bookmark-form {
