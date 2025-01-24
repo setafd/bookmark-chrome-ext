@@ -37,7 +37,6 @@ const renderUngroupedFolder = async () => {
       folder.children.filter((bookmark) => !bookmark.children)
     );
 
-    await initStorageCache;
     const groupTitle = await getUngroupedFolderName();
     renderBookmarks({ children: bookmarks, id: "-1" }, groupTitle);
   } catch (error) {

@@ -33,7 +33,7 @@ const onInit = async () => {
 
     if (hasUnfolderedLinks) {
       folders.push({
-        title: getUngroupedFolderName(),
+        title: await getUngroupedFolderName(),
         id: "-1",
       });
     }

@@ -92,15 +92,17 @@ export const onEditFolder = (event) => {
   folderInput.defaultValue = targetFolder.innerText;
   folderInput.id = id;
 
-  const deleteButton = document.createElement("img");
-  deleteButton.className = "navigation__item-icon navigation__item-delete";
-  deleteButton.src = chrome.runtime.getURL("assets/delete.svg");
-  deleteButton.addEventListener("click", onDeleteFolder);
-
   targetFolder.innerHTML = "";
 
+  if (id !== "-1") {
+    const deleteButton = document.createElement("img");
+    deleteButton.className = "navigation__item-icon navigation__item-delete";
+    deleteButton.src = chrome.runtime.getURL("assets/delete.svg");
+    deleteButton.addEventListener("click", onDeleteFolder);
+    targetFolder.append(deleteButton);
+  }
+
   targetFolder.prepend(folderInput);
-  targetFolder.append(deleteButton);
   folderInput.focus();
 
   targetFolder.ondblclick = "";
