@@ -16,6 +16,8 @@ const editBookmark = (id, title, url) =>
 const createBookmark = (title, url, parentId) =>
   chrome.bookmarks.create({ title, url, parentId });
 
+const deleteBookmark = (id) => chrome.bookmarks.remove(id);
+
 const openBookmark = async (event) => {
   const url = event.currentTarget.dataset.url;
   const groupTitle = event.currentTarget.dataset.group;

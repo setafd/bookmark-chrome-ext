@@ -121,6 +121,9 @@ const onEditBookmark = async (event) => {
 
   const editForm = document.getElementById("edit-bookmark");
 
+  const deleteButton = document.getElementById("delete-bookmark");
+  deleteButton.classList.remove("bookmark-form__delete-btn_hidden");
+
   const [titleInput, urlInput] = editForm.getElementsByTagName("input");
   urlInput.value = url;
   titleInput.value = title;
@@ -128,6 +131,7 @@ const onEditBookmark = async (event) => {
   editDialog.showModal();
 
   editForm.querySelector('button[type="reset"]').onclick = () => {
+    deleteButton.classList.add("bookmark-form__delete-btn_hidden");
     editDialog.close();
   };
 
@@ -142,6 +146,18 @@ const onEditBookmark = async (event) => {
 
     bookmarkItem.setAttribute("data-url", url);
     bookmarkItem.getElementsByTagName("span")[0].textContent = title;
+    deleteButton.classList.add("bookmark-form__delete-btn_hidden");
+    editDialog.close();
+  };
+
+  deleteButton.onclick = async () => {
+    await deleteBookmark(bookmarkId);
+
+    // Really lazy again :9
+    const selectedTab = document.getElementsByClassName(
+      "navigation__item_selected"
+    )[0];
+    renderFolder(selectedTab.id);
     editDialog.close();
   };
 };

@@ -126,7 +126,13 @@ dialog::backdrop {
 }
 
 .bookmark-form__footer {
-  align-self: flex-end;
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+}
+
+.bookmark-form__delete-btn_hidden {
+  display: none;
 }
 
 *::-webkit-scrollbar {
