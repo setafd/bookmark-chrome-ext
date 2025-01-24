@@ -19,10 +19,18 @@ const createBookmark = (title, url, parentId) =>
 const openBookmark = async (event) => {
   const url = event.currentTarget.dataset.url;
   const groupTitle = event.currentTarget.dataset.group;
-  const tab = await chrome.tabs.create({
-    url,
-    active: !event.ctrlKey,
-  });
+
+  let tab = await chrome.tabs.getCurrent();
+  const openInCurrentTab = !event.ctrlKey;
+
+  if (openInCurrentTab) {
+    window.open(url, "_self");
+  } else {
+    tab = await chrome.tabs.create({
+      url,
+      active: !event.ctrlKey,
+    });
+  }
 
   const groups = await chrome.tabGroups.query({});
   const group = groups.find((g) => g.title === groupTitle);
@@ -41,9 +49,6 @@ const openBookmark = async (event) => {
       title: groupTitle,
     });
   }
-
-  const newTab = await chrome.tabs.getCurrent();
-  if (!event.ctrlKey) await chrome.tabs.remove(newTab.id);
 };
 
 const renderFolder = async (id) => {
