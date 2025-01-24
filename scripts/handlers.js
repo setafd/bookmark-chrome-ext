@@ -33,6 +33,12 @@ const onEditFolderName = (event) => {
   folderInput.focus();
 
   targetFolder.ondblclick = "";
+
+  targetFolder.setAttribute("draggable", "false");
+  targetFolder.ondragstart = "";
+  targetFolder.ondragend = "";
+  targetFolder.ondragenter = "";
+
   targetFolder.addEventListener("keydown", saveFolderName);
   targetFolder.addEventListener("focusout", resetFolderName);
 };
@@ -58,8 +64,15 @@ const saveFolderName = async (event) => {
 
       targetFolder.removeEventListener("keydown", saveFolderName);
       targetFolder.removeEventListener("focusout", resetFolderName);
+
       targetFolder.innerHTML = name;
+
       targetFolder.ondblclick = onEditFolderName;
+
+      targetFolder.draggable = "true";
+      targetFolder.ondragstart = onDragStartHeaderItem;
+      targetFolder.ondragend = onDragEndHeaderItem;
+      targetFolder.ondragenter = onDragEnterHeaderItem;
     } catch (e) {
       alert("Something went wrong. Can't update folder name");
       console.error(e);
@@ -74,6 +87,11 @@ const saveFolderName = async (event) => {
     targetFolder.removeEventListener("focusout", resetFolderName);
     targetFolder.innerHTML = name;
     targetFolder.ondblclick = onEditFolderName;
+
+    targetFolder.draggable = "true";
+    targetFolder.ondragstart = onDragStartHeaderItem;
+    targetFolder.ondragend = onDragEndHeaderItem;
+    targetFolder.ondragenter = onDragEnterHeaderItem;
   }
 };
 
@@ -83,6 +101,12 @@ const resetFolderName = (event) => {
 
   targetFolder.innerText = name;
   targetFolder.ondblclick = onEditFolderName;
+
+  targetFolder.draggable = "true";
+  targetFolder.ondragstart = onDragStartHeaderItem;
+  targetFolder.ondragend = onDragEndHeaderItem;
+  targetFolder.ondragenter = onDragEnterHeaderItem;
+
   targetFolder.removeEventListener("keydown", saveFolderName);
   targetFolder.removeEventListener("focusout", resetFolderName);
 };
