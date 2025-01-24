@@ -1,5 +1,9 @@
 import { renderFolder } from "../bookmarks/ui.js";
-import { setFolderOrder, setLastSelecftedFolder, setUngroupedFolderName } from "../store/api.js";
+import {
+  setFolderOrder,
+  setLastSelecftedFolder,
+  setUngroupedFolderName,
+} from "../store/api.js";
 import { updateFolder } from "./api.js";
 
 export const getActiveFolder = () => {

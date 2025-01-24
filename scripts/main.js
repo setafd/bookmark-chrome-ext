@@ -1,5 +1,9 @@
 import { getBookmarksTree } from "./bookmarks/api.js";
-import { getFolderOrder, getLastSelectedFolder, getUngroupedFolderName } from "./store/api.js";
+import {
+  getFolderOrder,
+  getLastSelectedFolder,
+  getUngroupedFolderName,
+} from "./store/api.js";
 import { createNavContainer, createNavItem } from "./tabs/ui.js";
 
 const isDarkTheme = window.matchMedia("(prefers-color-scheme: dark)");

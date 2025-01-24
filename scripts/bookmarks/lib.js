@@ -1,4 +1,3 @@
-import { setUngroupedFolderName } from "../store/api.js";
 import { openTab } from "../tabs/api.js";
 import { getActiveFolder } from "../tabs/lib.js";
 import {

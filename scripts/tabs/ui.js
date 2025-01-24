@@ -1,4 +1,10 @@
-import { onChangeFolder, onDragEndHeaderItem, onDragEnterHeaderItem, onDragStartHeaderItem, onEditFolder } from "./lib.js";
+import {
+  onChangeFolder,
+  onDragEndHeaderItem,
+  onDragEnterHeaderItem,
+  onDragStartHeaderItem,
+  onEditFolder,
+} from "./lib.js";
 
 export const createNavContainer = () => {
   const navigator = document.getElementById("nav");

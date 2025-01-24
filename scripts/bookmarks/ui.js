@@ -1,6 +1,14 @@
 import { getFaviconUrl } from "../shared/lib.js";
 import { getUngroupedFolderName } from "../store/api.js";
-import { onClickBookmark, onCreateBookmark, onDragEndBookmark, onDragEnterBookmark, onDragStartBookmark, onEditBookmark, onEditGroup } from "./lib.js";
+import {
+  onClickBookmark,
+  onCreateBookmark,
+  onDragEndBookmark,
+  onDragEnterBookmark,
+  onDragStartBookmark,
+  onEditBookmark,
+  onEditGroup,
+} from "./lib.js";
 
 export const renderFolder = async (id) => {
   if (id !== "-1") {
@@ -37,7 +45,7 @@ const renderUngroupedFolder = async () => {
   }
 };
 
-export const getBookmarkContainer = () => document.getElementById("bookmarks")
+export const getBookmarkContainer = () => document.getElementById("bookmarks");
 
 const renderBookmarks = (bookmarks, groupTitle) => {
   const content = getBookmarkContainer();
