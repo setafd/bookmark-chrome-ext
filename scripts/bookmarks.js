@@ -1,4 +1,14 @@
-const editFolderTitle = (id, title) => chrome.bookmarks.update(id, { title });
+const editFolderTitle = async (id, title) => {
+  const folder = await chrome.bookmarks.get(id);
+  await chrome.bookmarks.update(id, { title });
+
+  const groups = await chrome.tabGroups.query({});
+  const group = groups.find((g) => g.title === folder[0].title);
+
+  if (group) {
+    await chrome.tabGroups.update(group.id, { title });
+  }
+};
 
 const editBookmark = (id, title, url) =>
   chrome.bookmarks.update(id, { title, url });
