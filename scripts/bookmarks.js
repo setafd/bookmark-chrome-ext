@@ -74,6 +74,13 @@ const renderBookmarks = (bookmarks, groupTitle) => {
   content.innerHTML = "";
 
   renderBookmarksCards(bookmarks, groupTitle, content);
+  new Isotope(content, {
+    itemSelector: ".card",
+    layoutMode: "packery",
+    packery: {
+      gutter: 16,
+    }
+  });
 };
 
 const renderBookmarksCards = (bookmarks, groupTitle, parentNode) => {

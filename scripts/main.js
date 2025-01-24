@@ -31,8 +31,7 @@ const onInit = () => {
         const bookmark = topLevelFolder.children[j];
         if (bookmark.children) {
           folders.push(bookmark);
-        }
-        else {
+        } else {
           hasUnfolderedLinks = true;
         }
       }
