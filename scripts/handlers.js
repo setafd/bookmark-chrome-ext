@@ -34,10 +34,12 @@ const onEditFolderName = (event) => {
 
   targetFolder.ondblclick = "";
 
-  targetFolder.setAttribute("draggable", "false");
-  targetFolder.ondragstart = "";
-  targetFolder.ondragend = "";
-  targetFolder.ondragenter = "";
+  if (targetFolder.classList.contains("navigation__item")) {
+    targetFolder.setAttribute("draggable", "false");
+    targetFolder.ondragstart = "";
+    targetFolder.ondragend = "";
+    targetFolder.ondragenter = "";
+  }
 
   targetFolder.addEventListener("keydown", saveFolderName);
   targetFolder.addEventListener("focusout", resetFolderName);
@@ -80,18 +82,7 @@ const saveFolderName = async (event) => {
   }
 
   if (key === "Escape") {
-    const targetFolder = event.currentTarget;
-    const name = targetFolder.children[0].defaultValue;
-
-    targetFolder.removeEventListener("keydown", saveFolderName);
-    targetFolder.removeEventListener("focusout", resetFolderName);
-    targetFolder.innerHTML = name;
-    targetFolder.ondblclick = onEditFolderName;
-
-    targetFolder.draggable = "true";
-    targetFolder.ondragstart = onDragStartHeaderItem;
-    targetFolder.ondragend = onDragEndHeaderItem;
-    targetFolder.ondragenter = onDragEnterHeaderItem;
+    resetFolderName(event);
   }
 };
 
@@ -102,10 +93,12 @@ const resetFolderName = (event) => {
   targetFolder.innerText = name;
   targetFolder.ondblclick = onEditFolderName;
 
-  targetFolder.draggable = "true";
-  targetFolder.ondragstart = onDragStartHeaderItem;
-  targetFolder.ondragend = onDragEndHeaderItem;
-  targetFolder.ondragenter = onDragEnterHeaderItem;
+  if (targetFolder.classList.contains("navigation__item")) {
+    targetFolder.draggable = "true";
+    targetFolder.ondragstart = onDragStartHeaderItem;
+    targetFolder.ondragend = onDragEndHeaderItem;
+    targetFolder.ondragenter = onDragEnterHeaderItem;
+  }
 
   targetFolder.removeEventListener("keydown", saveFolderName);
   targetFolder.removeEventListener("focusout", resetFolderName);
