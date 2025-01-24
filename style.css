@@ -1,0 +1,102 @@
+:root {
+  --background: hsl(262.1 100% 95%);
+  --foreground: hsl(262.1 5% 0%);
+  --card: hsl(262.1 50% 90%);
+  --card-foreground: hsl(262.1 5% 10%);
+  --primary: hsl(262.1 88.3% 57.8%);
+  --border: hsl(262.1 30% 50%);
+}
+.dark {
+  --background: hsl(262.1 50% 5%);
+  --foreground: hsl(262.1 5% 90%);
+  --card: hsl(262.1 50% 0%);
+  --card-foreground: hsl(262.1 5% 90%);
+  --primary: hsl(262.1 88.3% 57.8%);
+  --border: hsl(262.1 30% 18%);
+}
+html {
+  height: 100dvh;
+}
+body {
+  height: 100dvh;
+  margin: 0;
+  padding: 0;
+  font-family: Arial, sans-serif;
+  font-size: 24px;
+  background-color: var(--background);
+}
+
+ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+h1 {
+  margin-block: 0.5rem;
+}
+
+span,
+h1 {
+  color: var(--card-foreground);
+}
+
+#bookmark-dashboard {
+  padding: 20px;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  grid-gap: 1rem;
+}
+
+.card {
+  font-size: 1rem;
+  background-color: var(--card);
+  border: 1px var(--border) solid;
+  border-radius: 0.5rem;
+  padding: 0.5rem;
+}
+
+.card__content {
+  line-height: 125%;
+  font-size: 0.8rem;
+  gap: 1em;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  border-end-end-radius: 8px;
+  border-start-end-radius: 8px;
+  padding: 1em;
+  position: relative;
+  background-color: var(--card);
+}
+
+.card__content::before {
+  width: 2px;
+  content: "";
+  height: 100%;
+  position: absolute;
+  top: 0;
+  left: 0;
+  background-color: var(--border);
+  border-radius: 8px;
+}
+
+.card__title,
+.card__item {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.item__link {
+  display: flex;
+  gap: 0.5rem;
+  padding: 2px;
+}
+
+.item__link:hover {
+  color: var(--primary);
+  text-decoration: underline;
+  cursor: pointer;
+}
