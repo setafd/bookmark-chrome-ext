@@ -35,7 +35,7 @@ const createCard = (groupTitle, bookmarks, parentTitle = groupTitle) => {
   const content = createCardContentEl();
 
   for (let j = 0; j < bookmarks.length; j++) {
-    const { title, url, children } = bookmarks[j];
+    const { title, url, children, id } = bookmarks[j];
 
     if (children !== undefined) {
       const secondLevelGroup = createCard(title, children, parentTitle);
@@ -44,7 +44,7 @@ const createCard = (groupTitle, bookmarks, parentTitle = groupTitle) => {
       continue;
     }
 
-    const bookmarkItem = createCardItem(title, url, parentTitle);
+    const bookmarkItem = createCardItem(id, title, url, parentTitle);
 
     content.append(bookmarkItem);
   }
@@ -54,7 +54,7 @@ const createCard = (groupTitle, bookmarks, parentTitle = groupTitle) => {
   return groupCard;
 };
 
-const createCardItem = (title, url, parentTitle) => {
+const createCardItem = (bookmarkId, title, url, parentTitle) => {
   const favIconUrl = getFaviconUrl(url);
   const favicon = document.createElement("img");
   favicon.src = favIconUrl;
@@ -71,7 +71,55 @@ const createCardItem = (title, url, parentTitle) => {
   bookmarkItem.setAttribute("data-title", parentTitle);
   bookmarkItem.onclick = onOpenLink;
 
+  const editBtn = createEditButton(bookmarkId);
+  bookmarkItem.append(editBtn);
+
   return bookmarkItem;
+};
+
+const createEditButton = (bookmark) => {
+  const editBtn = document.createElement("button");
+  editBtn.append("<>");
+  editBtn.className = "item__edit-button";
+  editBtn.setAttribute("data-bookmark", bookmark);
+  editBtn.onclick = onOpenEditDialog;
+
+  return editBtn;
+};
+
+const onOpenEditDialog = async (ev) => {
+  ev.stopPropagation();
+  const bookmarkId = ev.currentTarget.getAttribute("data-bookmark");
+
+  const editDialog = document.getElementById("dialog");
+
+  let { title, url } = (await chrome.bookmarks.get(bookmarkId))[0];
+
+  const editForm = document.getElementById("edit-bookmark");
+
+  const [titleInput, urlInput] = editForm.getElementsByTagName("input");
+  urlInput.value = url;
+  titleInput.value = title;
+
+  editDialog.showModal();
+
+  editForm.querySelector('button[type="reset"]').onclick = () => {
+    editDialog.close();
+  };
+
+  editForm.onsubmit = async (event) => {
+    event.preventDefault();
+
+    const bookmarkItem = document.querySelector(`li[data-url="${url}"]`);
+
+    title = titleInput.value;
+    url = urlInput.value;
+    await chrome.bookmarks.update(bookmarkId, { title, url });
+
+    bookmarkItem.setAttribute("data-url", url);
+    bookmarkItem.getElementsByTagName("span")[0].textContent = title;
+    editDialog.close();
+  };
 };
 
 const onOpenLink = async (ev) => {

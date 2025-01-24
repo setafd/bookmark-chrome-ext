@@ -6,6 +6,22 @@
     <link rel="stylesheet" type="text/css" href="style.css" />
   </head>
   <body>
+    <dialog id="dialog" class="edit-modal">
+      <form id="edit-bookmark" class="edit-form">
+        <label>
+          Title
+          <input name="title" />
+        </label>
+        <label>
+          Url
+          <input name="url" />
+        </label>
+        <div>
+          <button class="edit-form__button" type="submit">Save</button>
+          <button class="edit-form__button" type="reset">Cancel</button>
+        </div>
+      </form>
+    </dialog>
     <div id="bookmarks"></div>
 
     <script src="script.js"></script>
