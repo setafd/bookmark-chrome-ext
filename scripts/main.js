@@ -32,7 +32,7 @@ const onInit = () => {
         if (bookmark.children) {
           folders.push(bookmark);
         }
-        {
+        else {
           hasUnfolderedLinks = true;
         }
       }
