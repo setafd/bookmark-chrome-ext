@@ -65,3 +65,8 @@
 .card__item:hover .card__item-edit-btn {
   display: block;
 }
+
+.card__item_droppable {
+  transition: transform 0.01s;
+  transform: translateX(-9999px);
+}

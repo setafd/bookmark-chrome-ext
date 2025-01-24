@@ -8,7 +8,7 @@ const onChangeFolder = (event) => {
   selectedEl?.classList.remove("navigation__item_selected");
   event.currentTarget.classList.add("navigation__item_selected");
 
-  const id = event.target.dataset.id;
+  const id = event.target.id;
   if (id === "-1") {
     renderUngroupedFolder();
   } else {
@@ -20,12 +20,12 @@ const onChangeFolder = (event) => {
 
 const onEditFolderName = (event) => {
   const targetFolder = event.currentTarget;
-  const id = targetFolder.dataset.id;
+  const id = targetFolder.id;
 
   const folderInput = document.createElement("input");
   folderInput.value = targetFolder.innerText;
   folderInput.defaultValue = targetFolder.innerText;
-  folderInput.setAttribute("data-id", id);
+  folderInput.id = id;
 
   targetFolder.innerHTML = "";
 
@@ -47,7 +47,7 @@ const saveFolderName = async (event) => {
   const { key } = event;
   if (key === "Enter") {
     const targetFolder = event.currentTarget;
-    const id = targetFolder.dataset.id;
+    const id = targetFolder.id;
     const name = targetFolder.children[0].value;
 
     if (name === "") {
@@ -113,7 +113,7 @@ const resetFolderName = (event) => {
 
 const onEditBookmark = async (event) => {
   event.stopPropagation();
-  const bookmarkId = event.currentTarget.parentNode.dataset.id;
+  const bookmarkId = event.currentTarget.parentNode.id;
 
   const editDialog = document.getElementById("dialog");
 
@@ -182,4 +182,47 @@ const onDragEndHeaderItem = (event) => {
   }
 
   chrome.storage.sync.set({ order: ids });
+};
+
+const onDragStartFolderItem = (event) => {
+  event.target.classList.add("card__item_droppable");
+  dragElementId = event.target.id;
+};
+
+const onDragEnterFolderItem = (event) => {
+  if (event.currentTarget.id === dragElementId) return;
+
+  const dragElement = document.getElementById(dragElementId);
+
+  const parentNode = event.currentTarget.parentNode;
+
+  for (let i = 0; i < parentNode.children.length; i++) {
+    if (event.currentTarget.parentNode.children[i].id === dragElementId) {
+      parentNode.insertBefore(dragElement, event.currentTarget.nextSibling);
+      break;
+    } else if (parentNode.children[i].id === event.currentTarget.id) {
+      parentNode.insertBefore(dragElement, event.currentTarget);
+      break;
+    }
+  }
+};
+
+const onDragEndFolderItem = async (event) => {
+  event.target.classList.remove("card__item_droppable");
+
+  const bookmark = (await chrome.bookmarks.get(event.target.id))[0];
+  const newIndex = Array.prototype.indexOf.call(
+    event.target.parentNode.children,
+    event.target
+  );
+  const parentId = event.target.parentNode.id;
+
+  if (newIndex === event.target.parentNode.children.length - 1) {
+    await chrome.bookmarks.move(bookmark.id, { parentId });
+  } else {
+    await chrome.bookmarks.move(bookmark.id, {
+      parentId,
+      index: newIndex,
+    });
+  }
 };

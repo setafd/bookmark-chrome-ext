@@ -45,7 +45,7 @@ const openBookmark = async (event) => {
 
 const renderFolder = async (id) => {
   const bookmarks = (await chrome.bookmarks.getSubTree(id))[0];
-  renderBookmarks({ children: bookmarks.children }, bookmarks.title);
+  renderBookmarks({ children: bookmarks.children, id: bookmarks.id }, bookmarks.title);
 };
 
 const renderUngroupedFolder = () =>
@@ -88,6 +88,7 @@ const renderBookmarksCards = (bookmarks, groupTitle, parentNode) => {
   card.className = "card";
   const content = document.createElement("ul");
   content.className = "card__content";
+  content.id = bookmarks.id;
 
   for (let i = 0; i < bookmarks.children.length; i++) {
     const bookmark = bookmarks.children[i];
@@ -102,7 +103,7 @@ const renderBookmarksCards = (bookmarks, groupTitle, parentNode) => {
         groupTitle
       );
 
-      content.prepend(item);
+      content.append(item);
     }
   }
 
@@ -110,7 +111,7 @@ const renderBookmarksCards = (bookmarks, groupTitle, parentNode) => {
     const title = document.createElement("h2");
     title.className = "card__title";
     title.innerText = bookmarks.title;
-    title.setAttribute("data-id", bookmarks.id);
+    title.id = bookmarks.id;
     title.ondblclick = onEditFolderName;
     card.prepend(title);
   }
@@ -123,7 +124,6 @@ const renderBookmarksCards = (bookmarks, groupTitle, parentNode) => {
 const createLinkItem = (id, title, url, group) => {
   const item = document.createElement("li");
   item.className = "card__item";
-  item.setAttribute("data-id", id);
   item.setAttribute("data-url", url);
   item.setAttribute("data-group", group);
   item.tabIndex = 0;
@@ -131,6 +131,11 @@ const createLinkItem = (id, title, url, group) => {
   item.onkeydown = (event) => {
     if (event.key === "Enter") openBookmark(event);
   };
+  item.id = id;
+  item.draggable = "true";
+  item.ondragstart = onDragStartFolderItem;
+  item.ondragend = onDragEndFolderItem;
+  item.ondragenter = onDragEnterFolderItem;
 
   const faviconUrl = getFaviconUrl(url);
   const img = document.createElement("img");

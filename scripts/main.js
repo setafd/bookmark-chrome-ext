@@ -60,7 +60,7 @@ const onInit = () => {
 
     if (lastSelectedId) {
       const lastSelectedEl = navigator.querySelector(
-        `li[data-id="${lastSelectedId}"]`
+        `li[id="${lastSelectedId}"]`
       );
       if (lastSelectedEl) lastSelectedEl.click();
       else navigator.children[0].click();
@@ -90,7 +90,6 @@ const pushToNavigation = (nav, title, id) => {
   item.onkeydown = (event) => {
     if (event.key === "Enter") onChangeFolder(event);
   };
-  item.setAttribute("data-id", id);
   item.id = id;
   item.draggable = "true";
   item.ondragstart = onDragStartHeaderItem;
