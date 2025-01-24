@@ -73,6 +73,8 @@ onInit();
 
 document.addEventListener("visibilitychange", function () {
   if (!document.hidden) {
+    const navigation = getNav();
+    navigation.innerHTML = "";
     onInit();
   }
 });
