@@ -1,6 +1,6 @@
-document.addEventListener("DOMContentLoaded", () => {
+const onInit = () => {
   chrome.bookmarks.getTree((bookmarkTreeNodes) => {
-    const bookmarkDashboard = document.getElementById("bookmark-dashboard");
+    const bookmarkDashboard = document.getElementById("bookmarks");
 
     const bookmarksGroups = bookmarkTreeNodes[0].children[1].children;
 
@@ -14,17 +14,17 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const isDarkTheme = window.matchMedia("(prefers-color-scheme: dark)");
 
-    var r = document.querySelector(":root");
-    if (isDarkTheme) r.className = "dark";
+    var root = document.querySelector(":root");
+    if (isDarkTheme) root.className = "dark";
   });
-});
+};
 
 const createCard = (groupTitle, bookmarks, parentTitle = groupTitle) => {
   const groupCard = createCardEl();
   bookmarks.sort((a, b) => {
-    if ((a.url && b.url) || (!a.url && !b.url)) return 0;
+    if (!a.url && b.url) return 1;
     if (a.url && !b.url) return -1;
-    return 1;
+    return 0;
   });
 
   const groupTitleElement = craeteCardTitleEl();
@@ -38,43 +38,13 @@ const createCard = (groupTitle, bookmarks, parentTitle = groupTitle) => {
     const { title, url, children } = bookmarks[j];
 
     if (children !== undefined) {
-      const secondLevelGroup = createCard(
-        title,
-        children,
-        parentTitle ?? groupTitle
-      );
+      const secondLevelGroup = createCard(title, children, parentTitle);
 
       content.append(secondLevelGroup);
       continue;
     }
 
-    const bookmarkItem = createCardItem(title, url);
-    bookmarkItem.onclick = async () => {
-      const tab = await chrome.tabs.create({
-        url: url,
-      });
-
-      const groups = await chrome.tabGroups.query({});
-      const group = groups.find((g) => g.title === parentTitle);
-
-      if (group) {
-        await chrome.tabs.group({
-          tabIds: [tab.id],
-          groupId: group.id,
-        });
-      } else {
-        const groupId = await chrome.tabs.group({
-          tabIds: [tab.id],
-        });
-
-        await chrome.tabGroups.update(groupId, {
-          title: parentTitle ?? groupTitle,
-        });
-      }
-
-      const newTab = await chrome.tabs.getCurrent();
-      await chrome.tabs.remove(newTab.id);
-    };
+    const bookmarkItem = createCardItem(title, url, parentTitle);
 
     content.append(bookmarkItem);
   }
@@ -84,20 +54,53 @@ const createCard = (groupTitle, bookmarks, parentTitle = groupTitle) => {
   return groupCard;
 };
 
-const createCardItem = (title, url) => {
+const createCardItem = (title, url, parentTitle) => {
   const favIconUrl = getFaviconUrl(url);
-  const icon = document.createElement("img");
-  icon.src = favIconUrl;
+  const favicon = document.createElement("img");
+  favicon.src = favIconUrl;
 
   const bookmarkLink = document.createElement("span");
-  bookmarkLink.className = "item__link";
+  bookmarkLink.className = "item__text";
   bookmarkLink.prepend(title);
-  bookmarkLink.prepend(icon);
 
   const bookmarkItem = createCardContentItemEl();
   bookmarkItem.append(bookmarkLink);
+  bookmarkItem.prepend(favicon);
+
+  bookmarkItem.setAttribute("data-url", url);
+  bookmarkItem.setAttribute("data-title", parentTitle);
+  bookmarkItem.onclick = onOpenLink;
 
   return bookmarkItem;
+};
+
+const onOpenLink = async (ev) => {
+  const url = ev.currentTarget.getAttribute("data-url");
+  const parentTitle = ev.currentTarget.getAttribute("data-title");
+  const tab = await chrome.tabs.create({
+    url: url,
+  });
+
+  const groups = await chrome.tabGroups.query({});
+  const group = groups.find((g) => g.title === parentTitle);
+
+  if (group) {
+    await chrome.tabs.group({
+      tabIds: [tab.id],
+      groupId: group.id,
+    });
+  } else {
+    const groupId = await chrome.tabs.group({
+      tabIds: [tab.id],
+    });
+
+    await chrome.tabGroups.update(groupId, {
+      title: parentTitle,
+    });
+  }
+
+  const newTab = await chrome.tabs.getCurrent();
+  await chrome.tabs.remove(newTab.id);
 };
 
 const createCardEl = () => {
@@ -134,3 +137,5 @@ const getFaviconUrl = (u) => {
   url.searchParams.set("size", "16");
   return url.toString();
 };
+
+document.addEventListener("DOMContentLoaded", onInit);

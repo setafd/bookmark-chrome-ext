@@ -26,6 +26,11 @@ body {
   background-color: var(--background);
 }
 
+button {
+  padding: 0;
+  border: none;
+}
+
 ul {
   margin: 0;
   padding: 0;
@@ -41,7 +46,7 @@ h1 {
   color: var(--card-foreground);
 }
 
-#bookmark-dashboard {
+#bookmarks {
   padding: 20px;
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
@@ -57,7 +62,6 @@ h1 {
 }
 
 .card__content {
-  line-height: 125%;
   font-size: 0.8rem;
   gap: 1em;
   position: relative;
@@ -83,20 +87,27 @@ h1 {
 }
 
 .card__title,
-.card__item {
+.item__text {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
-.item__link {
+.card__item {
   display: flex;
   gap: 0.5rem;
-  padding: 2px;
+  align-items: center;
 }
 
-.item__link:hover {
+.card__item:hover {
+  cursor: pointer;
+}
+
+.card__item:hover .item__text {
   color: var(--primary);
   text-decoration: underline;
-  cursor: pointer;
+}
+
+.item__text {
+  flex: 1;
 }
