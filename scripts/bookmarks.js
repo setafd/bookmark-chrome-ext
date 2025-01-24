@@ -18,6 +18,7 @@ const openBookmark = async (event) => {
   const groupTitle = event.currentTarget.dataset.group;
   const tab = await chrome.tabs.create({
     url,
+    active: !event.ctrlKey,
   });
 
   const groups = await chrome.tabGroups.query({});
@@ -39,7 +40,7 @@ const openBookmark = async (event) => {
   }
 
   const newTab = await chrome.tabs.getCurrent();
-  await chrome.tabs.remove(newTab.id);
+  if (!event.ctrlKey) await chrome.tabs.remove(newTab.id);
 };
 
 const renderFolder = async (id) => {
