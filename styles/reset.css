@@ -13,7 +13,7 @@
 
 body {
   /* 3. Add accessible line-height */
-  line-height: 1.5;
+  line-height: 1.2;
   /* 4. Improve text rendering */
   -webkit-font-smoothing: antialiased;
 }

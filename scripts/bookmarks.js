@@ -13,6 +13,9 @@ const editFolderTitle = async (id, title) => {
 const editBookmark = (id, title, url) =>
   chrome.bookmarks.update(id, { title, url });
 
+const createBookmark = (title, url, parentId) =>
+  chrome.bookmarks.create({ title, url, parentId });
+
 const openBookmark = async (event) => {
   const url = event.currentTarget.dataset.url;
   const groupTitle = event.currentTarget.dataset.group;
@@ -45,7 +48,10 @@ const openBookmark = async (event) => {
 
 const renderFolder = async (id) => {
   const bookmarks = (await chrome.bookmarks.getSubTree(id))[0];
-  renderBookmarks({ children: bookmarks.children, id: bookmarks.id }, bookmarks.title);
+  renderBookmarks(
+    { children: bookmarks.children, id: bookmarks.id },
+    bookmarks.title
+  );
 };
 
 const renderUngroupedFolder = () =>
@@ -79,7 +85,7 @@ const renderBookmarks = (bookmarks, groupTitle) => {
     layoutMode: "packery",
     packery: {
       gutter: 16,
-    }
+    },
   });
 };
 
@@ -118,7 +124,24 @@ const renderBookmarksCards = (bookmarks, groupTitle, parentNode) => {
 
   card.append(content);
 
-  if (content.innerHTML !== "") parentNode.prepend(card);
+  if (content.innerHTML !== "") {
+    parentNode.prepend(card);
+    const createItem = document.createElement("li");
+    createItem.className = "card__item";
+    createItem.onclick = onCreateBookmark;
+
+    const createIcon = document.createElement("img");
+    createIcon.src = chrome.runtime.getURL("assets/plus.svg");
+    createIcon.className = "card__item-create-btn";
+    createItem.append(createIcon);
+
+    const text = document.createElement("span");
+    text.className = "card__item-text";
+    text.innerText = "Add Bookmark";
+
+    createItem.append(text);
+    content.append(createItem);
+  }
 };
 
 const createLinkItem = (id, title, url, group) => {

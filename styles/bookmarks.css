@@ -37,7 +37,7 @@
   align-items: center;
 
   gap: 8px;
-  padding: 4px;
+  padding: 6px;
   cursor: pointer;
 }
 
@@ -69,4 +69,13 @@
 .card__item_droppable {
   transition: transform 0.01s;
   transform: translateX(-9999px);
+}
+
+.dark .card__item-create-btn {
+  filter: invert(99%) sepia(100%) saturate(0%) hue-rotate(306deg)
+    brightness(105%) contrast(100%);
+}
+
+.card__item:hover .card__item-create-btn {
+  filter: invert(33%) sepia(76%) saturate(4208%) hue-rotate(245deg) brightness(92%) contrast(87%);
 }

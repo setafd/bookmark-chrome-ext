@@ -146,6 +146,41 @@ const onEditBookmark = async (event) => {
   };
 };
 
+const onCreateBookmark = async (event) => {
+  event.stopPropagation();
+  const folderId = event.currentTarget.parentNode.id;
+
+  const editDialog = document.getElementById("dialog");
+
+  const editForm = document.getElementById("edit-bookmark");
+
+  editDialog.showModal();
+
+  editForm.querySelector('button[type="reset"]').onclick = () => {
+    editDialog.close();
+  };
+
+  editForm.onsubmit = async (event) => {
+    event.preventDefault();
+    const [titleInput, urlInput] = editForm.getElementsByTagName("input");
+
+    title = titleInput.value;
+    url = urlInput.value;
+    try {
+      await createBookmark(title, url, folderId);
+
+      // Really lazy :9
+      const selectedTab = document.getElementsByClassName(
+        "navigation__item_selected"
+      )[0];
+      renderFolder(selectedTab.id);
+      editDialog.close();
+    } catch (e) {
+      alert(e);
+    }
+  };
+};
+
 let dragElementId;
 
 const onDragStartHeaderItem = (event) => {
