@@ -123,7 +123,17 @@ const onDeleteFolder = async (event) => {
     parentNode.removeEventListener("focusout", onResetFolder);
     parentNode.remove();
     const nav = getNav();
-    nav.firstElementChild?.click();
+
+    const newSelectedTab = nav.firstElementChild;
+
+    if (newSelectedTab) {
+      newSelectedTab.click();
+    } else {
+      // trigger full page reloading in case no folders in navigation
+      // to render default ungroup folder (not implemented right now)
+      const event = new Event("visibilitychange");
+      document.dispatchEvent(event);
+    }
   }
 };
 
