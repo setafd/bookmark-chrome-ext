@@ -1,55 +1,16 @@
-const editFolderTitle = async (id, title) => {
-  try {
-    const folder = await chrome.bookmarks.get(id);
-    await chrome.bookmarks.update(id, { title });
+import { getFaviconUrl } from "../shared/lib.js";
+import { getUngroupedFolderName } from "../store/api.js";
+import { onClickBookmark, onCreateBookmark, onDragEndBookmark, onDragEnterBookmark, onDragStartBookmark, onEditBookmark, onEditGroup } from "./lib.js";
 
-    const groups = await chrome.tabGroups.query({});
-    const group = groups.find((g) => g.title === folder[0].title);
-
-    if (group) {
-      await chrome.tabGroups.update(group.id, { title });
-    }
-  } catch (error) {
-    console.error(`Error editing folder title: ${error}`);
+export const renderFolder = async (id) => {
+  if (id !== "-1") {
+    renderFolderById(id);
+  } else {
+    renderUngroupedFolder();
   }
 };
 
-const editBookmark = (id, title, url) =>
-  chrome.bookmarks.update(id, { title, url });
-
-const createBookmark = (title, url, parentId) =>
-  chrome.bookmarks.create({ title, url, parentId });
-
-const deleteBookmark = (id) => chrome.bookmarks.remove(id);
-
-const openBookmark = async (event) => {
-  try {
-    const url = event.currentTarget.dataset.url;
-    const groupTitle = event.currentTarget.dataset.group;
-    const openInCurrentTab = !event.ctrlKey;
-
-    let tab = await chrome.tabs.getCurrent();
-    if (openInCurrentTab) {
-      window.open(url, "_self");
-    } else {
-      tab = await chrome.tabs.create({ url, active: false });
-    }
-
-    const groups = await chrome.tabGroups.query({});
-    const group = groups.find((g) => g.title === groupTitle);
-
-    if (group) {
-      await chrome.tabs.group({ tabIds: [tab.id], groupId: group.id });
-    } else {
-      const groupId = await chrome.tabs.group({ tabIds: [tab.id] });
-      await chrome.tabGroups.update(groupId, { title: groupTitle });
-    }
-  } catch (error) {
-    console.error(`Error opening bookmark: ${error}`);
-  }
-};
-
-const renderFolder = async (id) => {
+const renderFolderById = async (id) => {
   try {
     const bookmarks = (await chrome.bookmarks.getSubTree(id))[0];
     renderBookmarks(
@@ -69,15 +30,17 @@ const renderUngroupedFolder = async () => {
     );
 
     await initStorageCache;
-    const groupTitle = storageCache.ungroupedFolderName ?? "Ungrouped";
-    renderBookmarks({ children: bookmarks }, groupTitle);
+    const groupTitle = await getUngroupedFolderName();
+    renderBookmarks({ children: bookmarks, id: "-1" }, groupTitle);
   } catch (error) {
     console.error(`Error rendering ungrouped folder: ${error}`);
   }
 };
 
+export const getBookmarkContainer = () => document.getElementById("bookmarks")
+
 const renderBookmarks = (bookmarks, groupTitle) => {
-  const content = document.getElementById("bookmarks");
+  const content = getBookmarkContainer();
 
   content.innerHTML = "";
 
@@ -120,7 +83,7 @@ const renderBookmarksCards = (bookmarks, groupTitle, parentNode) => {
     title.className = "card__title";
     title.innerText = bookmarks.title;
     title.id = bookmarks.id;
-    title.ondblclick = onEditFolderName;
+    title.ondblclick = onEditGroup;
     card.prepend(title);
   }
 
@@ -156,15 +119,15 @@ const createLinkItem = (id, title, url, group) => {
   item.setAttribute("data-url", url);
   item.setAttribute("data-group", group);
   item.tabIndex = 0;
-  item.onclick = openBookmark;
+  item.onclick = onClickBookmark;
   item.onkeydown = (event) => {
-    if (event.key === "Enter") openBookmark(event);
+    if (event.key === "Enter") onClickBookmark(event);
   };
   item.id = id;
   item.draggable = "true";
-  item.ondragstart = onDragStartFolderItem;
-  item.ondragend = onDragEndFolderItem;
-  item.ondragenter = onDragEnterFolderItem;
+  item.ondragstart = onDragStartBookmark;
+  item.ondragend = onDragEndBookmark;
+  item.ondragenter = onDragEnterBookmark;
 
   const faviconUrl = getFaviconUrl(url);
   const img = document.createElement("img");
@@ -182,11 +145,4 @@ const createLinkItem = (id, title, url, group) => {
   item.prepend(img, text, edit);
 
   return item;
-};
-
-const getFaviconUrl = (u) => {
-  const url = new URL(chrome.runtime.getURL("/_favicon/"));
-  url.searchParams.set("pageUrl", u);
-  url.searchParams.set("size", "16");
-  return url.toString();
 };

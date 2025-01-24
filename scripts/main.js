@@ -1,32 +1,17 @@
+import { getBookmarksTree } from "./bookmarks/api.js";
+import { getFolderOrder, getLastSelectedFolder, getUngroupedFolderName } from "./store/api.js";
+import { createNavContainer, createNavItem } from "./tabs/ui.js";
+
 const isDarkTheme = window.matchMedia("(prefers-color-scheme: dark)");
 const root = document.querySelector(":root");
 if (isDarkTheme) root.className = "dark";
 
-const storageCache = {};
-const initStorageCache = chrome.storage.sync.get().then((items) => {
-  Object.assign(storageCache, items);
-});
-
-const sessionCache = {};
-const initSessionCache = chrome.storage.session.get().then((items) => {
-  Object.assign(sessionCache, items);
-});
-
 const onInit = async () => {
   try {
-    const bookmarkTreeNodes = await new Promise((resolve, reject) => {
-      chrome.bookmarks.getTree((nodes) => {
-        if (chrome.runtime.lastError) {
-          reject(new Error(chrome.runtime.lastError));
-        } else {
-          resolve(nodes);
-        }
-      });
-    });
+    const bookmarkTreeNodes = await getBookmarksTree();
 
     const bookmarksTree = bookmarkTreeNodes[0].children;
-    await initStorageCache;
-    const folderOrder = storageCache.order;
+    const folderOrder = await getFolderOrder();
 
     const navigator = createNavContainer();
 
@@ -44,7 +29,7 @@ const onInit = async () => {
 
     if (hasUnfolderedLinks) {
       folders.push({
-        title: storageCache.ungroupedFolderName ?? "Ungrouped",
+        title: getUngroupedFolderName(),
         id: "-1",
       });
     }
@@ -55,12 +40,12 @@ const onInit = async () => {
       );
     }
 
-    folders.forEach((folder) =>
-      pushToNavigation(navigator, folder.title, folder.id)
-    );
+    folders.forEach((folder) => {
+      const navItem = createNavItem(folder.id, folder.title);
+      navigator.append(navItem);
+    });
 
-    await initSessionCache;
-    const lastSelectedId = sessionCache.last ?? null;
+    const lastSelectedId = await getLastSelectedFolder();
 
     if (lastSelectedId) {
       const lastSelectedEl = navigator.querySelector(
@@ -76,35 +61,4 @@ const onInit = async () => {
   }
 };
 
-const createNavContainer = () => {
-  const navigator = document.getElementById("nav");
-  const list = document.createElement("ul");
-  list.className = "navigation__wrapper";
-  navigator.prepend(list);
-
-  return list;
-};
-
-const pushToNavigation = (nav, title, id) => {
-  const item = document.createElement("li");
-  item.className = "navigation__item";
-  item.tabIndex = 0;
-  item.textContent = title;
-
-  item.ondblclick = onEditFolderName;
-  item.onclick = onChangeFolder;
-  item.onkeydown = (event) => {
-    if (event.key === "Enter") onChangeFolder(event);
-  };
-  item.id = id;
-  item.draggable = "true";
-  item.ondragstart = onDragStartHeaderItem;
-  item.ondragend = onDragEndHeaderItem;
-  item.ondragenter = onDragEnterHeaderItem;
-
-  nav.append(item);
-
-  return item;
-};
-
-document.addEventListener("DOMContentLoaded", onInit);
+onInit();
