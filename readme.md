@@ -15,6 +15,3 @@ It organizes and displays your bookmarks in groups, corresponding to the folders
 ## Usage
 1. Open a new tab in your browser.
 2. Navigate through the groups to find and open bookmarks organized by their folders.
-
-## License
-This project is released under the [MIT License](LICENSE).
