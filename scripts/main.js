@@ -1,5 +1,4 @@
 const isDarkTheme = window.matchMedia("(prefers-color-scheme: dark)");
-
 const root = document.querySelector(":root");
 if (isDarkTheme) root.className = "dark";
 
@@ -13,10 +12,19 @@ const initSessionCache = chrome.storage.session.get().then((items) => {
   Object.assign(sessionCache, items);
 });
 
-const onInit = () => {
-  chrome.bookmarks.getTree(async (bookmarkTreeNodes) => {
-    const bookmarksTree = bookmarkTreeNodes[0].children;
+const onInit = async () => {
+  try {
+    const bookmarkTreeNodes = await new Promise((resolve, reject) => {
+      chrome.bookmarks.getTree((nodes) => {
+        if (chrome.runtime.lastError) {
+          reject(new Error(chrome.runtime.lastError));
+        } else {
+          resolve(nodes);
+        }
+      });
+    });
 
+    const bookmarksTree = bookmarkTreeNodes[0].children;
     await initStorageCache;
     const folderOrder = storageCache.order;
 
@@ -24,18 +32,15 @@ const onInit = () => {
 
     let hasUnfolderedLinks = false;
     let folders = [];
-    for (let i = 0; i < bookmarksTree.length; i++) {
-      const topLevelFolder = bookmarksTree[i];
-
-      for (let j = 0; j < topLevelFolder.children.length; j++) {
-        const bookmark = topLevelFolder.children[j];
+    bookmarksTree.forEach((topLevelFolder) => {
+      topLevelFolder.children.forEach((bookmark) => {
         if (bookmark.children) {
           folders.push(bookmark);
         } else {
           hasUnfolderedLinks = true;
         }
-      }
-    }
+      });
+    });
 
     if (hasUnfolderedLinks) {
       folders.push({
@@ -50,10 +55,9 @@ const onInit = () => {
       );
     }
 
-    for (let i = 0; i < folders.length; i++) {
-      const folder = folders[i];
-      pushToNavigation(navigator, folder.title, folder.id);
-    }
+    folders.forEach((folder) =>
+      pushToNavigation(navigator, folder.title, folder.id)
+    );
 
     await initSessionCache;
     const lastSelectedId = sessionCache.last ?? null;
@@ -63,11 +67,13 @@ const onInit = () => {
         `li[id="${lastSelectedId}"]`
       );
       if (lastSelectedEl) lastSelectedEl.click();
-      else navigator.children[0].click();
+      else navigator.firstElementChild.click();
     } else {
-      navigator.children[0].click();
+      navigator.firstElementChild.click();
     }
-  });
+  } catch (error) {
+    console.error(`Error initializing: ${error}`);
+  }
 };
 
 const createNavContainer = () => {
@@ -83,7 +89,7 @@ const pushToNavigation = (nav, title, id) => {
   const item = document.createElement("li");
   item.className = "navigation__item";
   item.tabIndex = 0;
-  item.prepend(title);
+  item.textContent = title;
 
   item.ondblclick = onEditFolderName;
   item.onclick = onChangeFolder;

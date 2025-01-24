@@ -1,12 +1,16 @@
 const editFolderTitle = async (id, title) => {
-  const folder = await chrome.bookmarks.get(id);
-  await chrome.bookmarks.update(id, { title });
+  try {
+    const folder = await chrome.bookmarks.get(id);
+    await chrome.bookmarks.update(id, { title });
 
-  const groups = await chrome.tabGroups.query({});
-  const group = groups.find((g) => g.title === folder[0].title);
+    const groups = await chrome.tabGroups.query({});
+    const group = groups.find((g) => g.title === folder[0].title);
 
-  if (group) {
-    await chrome.tabGroups.update(group.id, { title });
+    if (group) {
+      await chrome.tabGroups.update(group.id, { title });
+    }
+  } catch (error) {
+    console.error(`Error editing folder title: ${error}`);
   }
 };
 
@@ -19,67 +23,58 @@ const createBookmark = (title, url, parentId) =>
 const deleteBookmark = (id) => chrome.bookmarks.remove(id);
 
 const openBookmark = async (event) => {
-  const url = event.currentTarget.dataset.url;
-  const groupTitle = event.currentTarget.dataset.group;
+  try {
+    const url = event.currentTarget.dataset.url;
+    const groupTitle = event.currentTarget.dataset.group;
+    const openInCurrentTab = !event.ctrlKey;
 
-  let tab = await chrome.tabs.getCurrent();
-  const openInCurrentTab = !event.ctrlKey;
+    let tab = await chrome.tabs.getCurrent();
+    if (openInCurrentTab) {
+      window.open(url, "_self");
+    } else {
+      tab = await chrome.tabs.create({ url, active: false });
+    }
 
-  if (openInCurrentTab) {
-    window.open(url, "_self");
-  } else {
-    tab = await chrome.tabs.create({
-      url,
-      active: !event.ctrlKey,
-    });
-  }
+    const groups = await chrome.tabGroups.query({});
+    const group = groups.find((g) => g.title === groupTitle);
 
-  const groups = await chrome.tabGroups.query({});
-  const group = groups.find((g) => g.title === groupTitle);
-
-  if (group) {
-    await chrome.tabs.group({
-      tabIds: [tab.id],
-      groupId: group.id,
-    });
-  } else {
-    const groupId = await chrome.tabs.group({
-      tabIds: [tab.id],
-    });
-
-    await chrome.tabGroups.update(groupId, {
-      title: groupTitle,
-    });
+    if (group) {
+      await chrome.tabs.group({ tabIds: [tab.id], groupId: group.id });
+    } else {
+      const groupId = await chrome.tabs.group({ tabIds: [tab.id] });
+      await chrome.tabGroups.update(groupId, { title: groupTitle });
+    }
+  } catch (error) {
+    console.error(`Error opening bookmark: ${error}`);
   }
 };
 
 const renderFolder = async (id) => {
-  const bookmarks = (await chrome.bookmarks.getSubTree(id))[0];
-  renderBookmarks(
-    { children: bookmarks.children, id: bookmarks.id },
-    bookmarks.title
-  );
+  try {
+    const bookmarks = (await chrome.bookmarks.getSubTree(id))[0];
+    renderBookmarks(
+      { children: bookmarks.children, id: bookmarks.id },
+      bookmarks.title
+    );
+  } catch (error) {
+    console.error(`Error rendering folder: ${error}`);
+  }
 };
 
-const renderUngroupedFolder = () =>
-  chrome.bookmarks.getTree(async (bookmarkTreeNodes) => {
-    const bookmarksTree = bookmarkTreeNodes[0].children;
+const renderUngroupedFolder = async () => {
+  try {
+    const bookmarksTree = (await chrome.bookmarks.getTree())[0].children;
+    const bookmarks = bookmarksTree.flatMap((folder) =>
+      folder.children.filter((bookmark) => !bookmark.children)
+    );
 
-    const bookmarks = [];
-    for (let i = 0; i < bookmarksTree.length; i++) {
-      const topLevelFolder = bookmarksTree[i];
-
-      for (let j = 0; j < topLevelFolder.children.length; j++) {
-        const bookmark = topLevelFolder.children[j];
-        if (!bookmark.children) {
-          bookmarks.push(bookmark);
-        }
-      }
-    }
     await initStorageCache;
     const groupTitle = storageCache.ungroupedFolderName ?? "Ungrouped";
     renderBookmarks({ children: bookmarks }, groupTitle);
-  });
+  } catch (error) {
+    console.error(`Error rendering ungrouped folder: ${error}`);
+  }
+};
 
 const renderBookmarks = (bookmarks, groupTitle) => {
   const content = document.getElementById("bookmarks");
@@ -133,22 +128,26 @@ const renderBookmarksCards = (bookmarks, groupTitle, parentNode) => {
 
   if (content.innerHTML !== "") {
     parentNode.prepend(card);
-    const createItem = document.createElement("li");
-    createItem.className = "card__item";
-    createItem.onclick = onCreateBookmark;
-
-    const createIcon = document.createElement("img");
-    createIcon.src = chrome.runtime.getURL("assets/plus.svg");
-    createIcon.className = "card__item-create-btn";
-    createItem.append(createIcon);
-
-    const text = document.createElement("span");
-    text.className = "card__item-text";
-    text.innerText = "Add Bookmark";
-
-    createItem.append(text);
-    content.append(createItem);
+    addCreateBookmarkButton(content);
   }
+};
+
+const addCreateBookmarkButton = (content) => {
+  const createItem = document.createElement("li");
+  createItem.className = "card__item";
+  createItem.onclick = onCreateBookmark;
+
+  const createIcon = document.createElement("img");
+  createIcon.src = chrome.runtime.getURL("assets/plus.svg");
+  createIcon.className = "card__item-create-btn";
+  createItem.append(createIcon);
+
+  const text = document.createElement("span");
+  text.className = "card__item-text";
+  text.innerText = "Add Bookmark";
+
+  createItem.append(text);
+  content.append(createItem);
 };
 
 const createLinkItem = (id, title, url, group) => {
@@ -180,9 +179,7 @@ const createLinkItem = (id, title, url, group) => {
   edit.className = "card__item-edit-btn";
   edit.onclick = onEditBookmark;
 
-  item.prepend(edit);
-  item.prepend(text);
-  item.prepend(img);
+  item.prepend(img, text, edit);
 
   return item;
 };

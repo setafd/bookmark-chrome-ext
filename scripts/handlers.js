@@ -1,10 +1,7 @@
 const onChangeFolder = (event) => {
-  const selectedEl = document.getElementsByClassName(
-    "navigation__item_selected"
-  )[0];
-  if (selectedEl === event.currentTarget) {
-    return;
-  }
+  const selectedEl = document.querySelector(".navigation__item_selected");
+  if (selectedEl === event.currentTarget) return;
+
   selectedEl?.classList.remove("navigation__item_selected");
   event.currentTarget.classList.add("navigation__item_selected");
 
@@ -64,9 +61,6 @@ const saveFolderName = async (event) => {
         chrome.storage.sync.set({ ungroupedFolderName: name });
       }
 
-      targetFolder.removeEventListener("keydown", saveFolderName);
-      targetFolder.removeEventListener("focusout", resetFolderName);
-
       targetFolder.innerHTML = name;
 
       targetFolder.ondblclick = onEditFolderName;
@@ -109,17 +103,16 @@ const onEditBookmark = async (event) => {
   const bookmarkId = event.currentTarget.parentNode.id;
 
   const editDialog = document.getElementById("dialog");
-
-  let { title, url } = (await chrome.bookmarks.get(bookmarkId))[0];
-
   const editForm = document.getElementById("edit-bookmark");
 
-  const deleteButton = document.getElementById("delete-bookmark");
-  deleteButton.classList.remove("bookmark-form__delete-btn_hidden");
+  let { title, url } = (await chrome.bookmarks.get(bookmarkId))[0];
 
   const [titleInput, urlInput] = editForm.getElementsByTagName("input");
   urlInput.value = url;
   titleInput.value = title;
+
+  const deleteButton = document.getElementById("delete-bookmark");
+  deleteButton.classList.remove("bookmark-form__delete-btn_hidden");
 
   editDialog.showModal();
 
@@ -147,21 +140,21 @@ const onEditBookmark = async (event) => {
     await deleteBookmark(bookmarkId);
 
     // Really lazy again :9
-    const selectedTab = document.getElementsByClassName(
-      "navigation__item_selected"
-    )[0];
-    renderFolder(selectedTab.id);
+    const selectedTab = document.querySelector("navigation__item_selected");
+    if (selectedTab.id !== "-1") {
+      renderFolder(selectedTab.id);
+    } else {
+      renderUngroupedFolder();
+    }
     editDialog.close();
   };
 };
 
 const onCreateBookmark = async (event) => {
   event.stopPropagation();
-  event.preventDefault();
   const folderId = event.currentTarget.parentNode.id;
 
   const editDialog = document.getElementById("dialog");
-
   const editForm = document.getElementById("edit-bookmark");
 
   editDialog.showModal();
@@ -173,16 +166,14 @@ const onCreateBookmark = async (event) => {
   editForm.onsubmit = async (event) => {
     event.preventDefault();
     const [titleInput, urlInput] = editForm.getElementsByTagName("input");
-
     title = titleInput.value;
     url = urlInput.value;
+
     try {
       await createBookmark(title, url, folderId);
 
       // Really lazy :9
-      const selectedTab = document.getElementsByClassName(
-        "navigation__item_selected"
-      )[0];
+      const selectedTab = document.querySelector("navigation__item_selected");
       renderFolder(selectedTab.id);
       editDialog.close();
     } catch (e) {
@@ -202,16 +193,17 @@ const onDragEnterHeaderItem = (event) => {
   if (event.target.id === dragElementId) return;
 
   const dragElement = document.getElementById(dragElementId);
+  const parentNode = event.target.parentNode;
 
-  for (let i = 0; i < dragElement.parentNode.children.length; i++) {
-    if (dragElement.parentNode.children[i].id === dragElementId) {
+  for (let i = 0; i < parentNode.children.length; i++) {
+    if (parentNode.children[i].id === dragElementId) {
       dragElement.parentNode.insertBefore(
         dragElement,
         event.target.nextSibling
       );
       break;
-    } else if (dragElement.parentNode.children[i].id === event.target.id) {
-      dragElement.parentNode.insertBefore(dragElement, event.target);
+    } else if (parentNode.children[i].id === event.target.id) {
+      parentNode.insertBefore(dragElement, event.target);
       break;
     }
   }
@@ -238,7 +230,6 @@ const onDragEnterFolderItem = (event) => {
   if (event.currentTarget.id === dragElementId) return;
 
   const dragElement = document.getElementById(dragElementId);
-
   const parentNode = event.currentTarget.parentNode;
 
   for (let i = 0; i < parentNode.children.length; i++) {
