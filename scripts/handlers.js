@@ -268,7 +268,7 @@ const onDragEndFolderItem = async (event) => {
   );
   const parentId = event.target.parentNode.id;
 
-  if (newIndex === event.target.parentNode.children.length - 1) {
+  if (newIndex === event.target.parentNode.children.length - 2) {
     await chrome.bookmarks.move(bookmark.id, { parentId });
   } else {
     await chrome.bookmarks.move(bookmark.id, {
