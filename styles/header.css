@@ -1,5 +1,3 @@
-
-
 .header {
   overflow: hidden;
 }
@@ -52,4 +50,9 @@
   height: 2px;
   content: "";
   background-color: var(--primary);
+}
+
+.navigation__item_droppable {
+  transition: transform 0.01s;
+  transform: translateX(-9999px);
 }

@@ -119,6 +119,43 @@ const onEditBookmark = async (event) => {
     bookmarkItem.setAttribute("data-url", url);
     bookmarkItem.getElementsByTagName("span")[0].textContent = title;
     editDialog.close();
-
   };
+};
+
+let dragElementId;
+
+const onDragStartHeaderItem = (event) => {
+  event.target.classList.add("navigation__item_droppable");
+  dragElementId = event.target.id;
+};
+
+const onDragEnterHeaderItem = (event) => {
+  if (event.target.id === dragElementId) return;
+
+  const dragElement = document.getElementById(dragElementId);
+
+  for (let i = 0; i < dragElement.parentNode.children.length; i++) {
+    if (dragElement.parentNode.children[i].id === dragElementId) {
+      dragElement.parentNode.insertBefore(
+        dragElement,
+        event.target.nextSibling
+      );
+      break;
+    } else if (dragElement.parentNode.children[i].id === event.target.id) {
+      dragElement.parentNode.insertBefore(dragElement, event.target);
+      break;
+    }
+  }
+};
+
+const onDragEndHeaderItem = (event) => {
+  event.target.classList.remove("navigation__item_droppable");
+
+  const navigator = document.getElementById("nav").children[0];
+  const ids = [];
+  for (let i = 0; i < navigator.children.length; i++) {
+    ids.push(navigator.children[i].id);
+  }
+
+  chrome.storage.sync.set({ order: ids });
 };
