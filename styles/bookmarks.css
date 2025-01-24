@@ -1,0 +1,71 @@
+#bookmarks {
+  margin: 1rem;
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  align-content: flex-start;
+  gap: 1rem;
+}
+
+.card {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.card__title {
+  color: var(--card-foreground);
+  user-select: none;
+  cursor: text;
+}
+
+.card__content {
+  border-block: 1px solid var(--card-foreground);
+  border-radius: var(--radius);
+  background-color: var(--card);
+
+  display: flex;
+  flex-direction: column;
+
+  padding-block: 16px;
+  padding-inline: 8px;
+  width: 250px;
+
+  overflow: hidden;
+}
+
+.card__item {
+  color: var(--card-foreground);
+
+  display: flex;
+  align-items: center;
+
+  gap: 8px;
+  padding: 4px;
+  cursor: pointer;
+}
+
+.card__item-text {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  flex: 1;
+}
+
+.card__item:hover {
+  color: var(--primary);
+}
+
+.dark .card__item-edit-btn {
+  filter: invert(99%) sepia(100%) saturate(0%) hue-rotate(306deg)
+    brightness(105%) contrast(100%);
+}
+
+.card__item-edit-btn {
+  display: none;
+  height: 100%;
+}
+
+.card__item:hover .card__item-edit-btn {
+  display: block;
+}
