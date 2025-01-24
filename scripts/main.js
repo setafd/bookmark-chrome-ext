@@ -74,7 +74,7 @@ onInit();
 document.addEventListener("visibilitychange", function () {
   if (!document.hidden) {
     const navigation = getNav();
-    const createFolderBtn = document.getElementById('add-folder');
+    const createFolderBtn = document.getElementById("add-folder");
     navigation.innerHTML = "";
     navigation.prepend(createFolderBtn);
     onInit();

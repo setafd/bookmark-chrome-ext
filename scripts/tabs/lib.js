@@ -5,7 +5,7 @@ import {
   setLastSelecftedFolder,
   setUngroupedFolderName,
 } from "../store/api.js";
-import { createFolder, updateFolder } from "./api.js";
+import { createFolder, deleteFolder, updateFolder } from "./api.js";
 import { createNavItem } from "./ui.js";
 
 export const attachCreateFolder = () => {
@@ -54,7 +54,6 @@ const onCreateFolder = async (event) => {
 const onCreateFolderFinish = async (event) => {
   if (event.key === "Enter") {
     event.preventDefault();
-    event.preventDefault();
     const targetFolder = event.currentTarget;
     const name = targetFolder.firstElementChild.value;
 
@@ -93,9 +92,15 @@ export const onEditFolder = (event) => {
   folderInput.defaultValue = targetFolder.innerText;
   folderInput.id = id;
 
+  const deleteButton = document.createElement("img");
+  deleteButton.className = "navigation__item-icon navigation__item-delete";
+  deleteButton.src = chrome.runtime.getURL("assets/delete.svg");
+  deleteButton.addEventListener("click", onDeleteFolder);
+
   targetFolder.innerHTML = "";
 
   targetFolder.prepend(folderInput);
+  targetFolder.append(deleteButton);
   folderInput.focus();
 
   targetFolder.ondblclick = "";
@@ -104,6 +109,12 @@ export const onEditFolder = (event) => {
 
   targetFolder.addEventListener("keydown", onSaveFolder);
   targetFolder.addEventListener("focusout", onResetFolder);
+};
+
+const onDeleteFolder = async (event) => {
+  const parentNode = event.currentTarget.parentNode;
+  const res = await deleteFolder(parentNode.id);
+  if (res) parentNode.remove();
 };
 
 const onSaveFolder = async (event) => {
@@ -145,6 +156,7 @@ const onSaveFolder = async (event) => {
 };
 
 const onResetFolder = (event) => {
+  if (event.currentTarget.contains(event.relatedTarget)) return;
   const targetFolder = event.currentTarget;
   const name = targetFolder.children[0].defaultValue;
 

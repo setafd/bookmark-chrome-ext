@@ -36,11 +36,15 @@ export const openTab = async (url, groupTitle, inCurrent) => {
 };
 
 export const createFolder = async (title) => {
-  const bookmarkTree = await getBookmarksTree();
+  try {
+    const bookmarkTree = await getBookmarksTree();
 
-  const parent = bookmarkTree.pop();
+    const parent = bookmarkTree.pop();
 
-  return await chrome.bookmarks.create({ title, parentId: parent.id });
+    return await chrome.bookmarks.create({ title, parentId: parent.id });
+  } catch (error) {
+    console.error(`Error creating folder: ${error}`);
+  }
 };
 
 export const updateFolder = async (id, title) => {
@@ -53,5 +57,28 @@ export const updateFolder = async (id, title) => {
     return folder;
   } catch (error) {
     console.error(`Error editing folder title: ${error}`);
+  }
+};
+
+export const deleteFolder = async (id) => {
+  try {
+    const folder = (await chrome.bookmarks.getSubTree(id))[0];
+    if (folder.children?.length > 0) {
+      if (
+        window.confirm(
+          "Do you really want to delete the non-empty folder along with all its bookmarks?"
+        )
+      ) {
+        await chrome.bookmarks.removeTree(id);
+        return true;
+      } else {
+        return false;
+      }
+    } else {
+      await chrome.bookmarks.remove(id);
+      return true;
+    }
+  } catch (error) {
+    console.error(`Error deleting folder: ${error}`);
   }
 };
