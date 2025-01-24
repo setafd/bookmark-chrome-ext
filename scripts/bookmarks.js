@@ -136,6 +136,10 @@ const renderBookmarksCards = (bookmarks, groupTitle, parentNode) => {
     const createItem = document.createElement("li");
     createItem.className = "card__item";
     createItem.onclick = onCreateBookmark;
+    createItem.tabIndex = 0;
+    createItem.onkeydown = (event) => {
+      if (event.key === "Enter") onCreateBookmark(event);
+    };
 
     const createIcon = document.createElement("img");
     createIcon.src = chrome.runtime.getURL("assets/plus.svg");

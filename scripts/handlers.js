@@ -157,6 +157,7 @@ const onEditBookmark = async (event) => {
 
 const onCreateBookmark = async (event) => {
   event.stopPropagation();
+  event.preventDefault();
   const folderId = event.currentTarget.parentNode.id;
 
   const editDialog = document.getElementById("dialog");
