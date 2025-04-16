@@ -1,3 +1,5 @@
+# Development abandoned. Add-on is rewritten to another stack
+
 # Chromium Extension: Bookmark Dashboard
 
 ## Overview
